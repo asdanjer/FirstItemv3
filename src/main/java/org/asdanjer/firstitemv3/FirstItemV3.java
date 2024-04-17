@@ -165,6 +165,9 @@ public final class FirstItemV3 extends JavaPlugin implements Listener {
         Path destination = Paths.get(getDataFolder().getAbsolutePath(), "config_backup.yml");
 
         try {
+            if(Files.exists(destination)) {
+                Files.delete(destination);
+            }
             Files.copy(source, destination);
         } catch (IOException e) {
             Bukkit.getLogger().severe("Failed to create config file backup.");

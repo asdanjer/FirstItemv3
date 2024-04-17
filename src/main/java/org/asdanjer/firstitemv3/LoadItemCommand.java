@@ -39,9 +39,10 @@ public class LoadItemCommand implements CommandExecutor {
             Player player = (Player) sender;
             List<String> materialsInInventory = getMaterialsInInventory(player);
             saveMaterialsToConfig(materialsInInventory);
+            player.sendMessage("Items in your inventory have been saved to the config.");
             return true;
         } else {
-            Bukkit.getLogger().info("This command can only be run by a player.");
+            sender.sendMessage("You are not a Player or do not have the permission to use this command.");
             return false;
         }
     }
