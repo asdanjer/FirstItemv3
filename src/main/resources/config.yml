@@ -1,0 +1,5 @@
+#Enableing this disabled the normal plugin and is used to generate the config file for newer minecraft versions
+#To do so set it to true, put the new items in your inventory and run /additems
+entrymode: false
+1-20-4:
+  - "BAMBOO_BLOCK"
