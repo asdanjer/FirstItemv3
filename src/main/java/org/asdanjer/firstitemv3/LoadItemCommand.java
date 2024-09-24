@@ -12,29 +12,26 @@ import org.bukkit.inventory.PlayerInventory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.bukkit.Bukkit.getServer;
 
 public class LoadItemCommand implements CommandExecutor {
     private FirstItemV3 plugin;
     private String mcVersion;
+    private boolean entrymode;
 
-    public LoadItemCommand(FirstItemV3 pluign) {
+    public LoadItemCommand(FirstItemV3 pluign, String mcVersion, boolean entrymode) {
         this.plugin = pluign;
-        String serverVersion = getServer().getVersion();
-        Pattern pattern = Pattern.compile("MC: (\\d+\\.\\d+\\.\\d+)");
-        Matcher matcher = pattern.matcher(serverVersion);
-        mcVersion = "unknown";
-        if (matcher.find()) {
-            mcVersion = matcher.group(1);
-        }
-        mcVersion=mcVersion.replace(".", "-");
+        this.mcVersion=mcVersion;
+        this.entrymode=entrymode;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!entrymode) {
+            sender.sendMessage("Entrymode is disabled. Please enable it in the config.");
+            return false;
+        }
         if (sender instanceof Player && sender.hasPermission("firstitemv3.additems")) {
             Player player = (Player) sender;
             List<String> materialsInInventory = getMaterialsInInventory(player);

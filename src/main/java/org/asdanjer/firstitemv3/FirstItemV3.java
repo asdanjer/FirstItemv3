@@ -15,12 +15,12 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public final class FirstItemV3 extends JavaPlugin implements Listener {
     private List<String> itemsForCurrentVersion;
     String mcVersion;
+    boolean entrymode;
+
 
     public static class FoundItem {
         private final OfflinePlayer player;
@@ -51,21 +51,17 @@ public final class FirstItemV3 extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         this.saveDefaultConfig();
-        if(getConfig().getBoolean("entrymode")) {
-            //register a new comand in a new class
-            getCommand("additems").setExecutor(new LoadItemCommand(this));
-        }else{
-        // Plugin startup logic
+        mcVersion = getConfig().getString("mcVersion");
+        entrymode = getConfig().getBoolean("entrymode");
+        try {
+            getCommand("additems").setExecutor(new LoadItemCommand(this,mcVersion,entrymode));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(!entrymode)
+        {
         firstFoundItems = new HashMap<>();
         getServer().getPluginManager().registerEvents(this, this);
-        String serverVersion = getServer().getVersion();
-        Pattern pattern = Pattern.compile("MC: (\\d+\\.\\d+\\.\\d+)");
-        Matcher matcher = pattern.matcher(serverVersion);
-        mcVersion = "unknown";
-        if (matcher.find()) {
-            mcVersion = matcher.group(1);
-        }
-        mcVersion=mcVersion.replace(".", "-");
         itemsForCurrentVersion = getConfig().getStringList(mcVersion);
         System.out.println(itemsForCurrentVersion);
         if(!itemsForCurrentVersion.isEmpty()){
@@ -90,9 +86,9 @@ public final class FirstItemV3 extends JavaPlugin implements Listener {
         savelist();
     }
     public void savelist(){
-        backupConfigFile();
         getConfig().set("ItemFound "+ mcVersion, getfoundstring());
         saveConfig();
+        backupConfigFile();
     }
 
     @EventHandler
@@ -128,8 +124,9 @@ public final class FirstItemV3 extends JavaPlugin implements Listener {
     }
     public String getfoundstring(){
         StringBuilder foundItemsString = new StringBuilder();
+        if(firstFoundItems==null ||	firstFoundItems.isEmpty()) return "";
         for (Map.Entry<Material, FoundItem> entry : firstFoundItems.entrySet()) {
-            String locationString = entry.getValue().getLocation().getWorld() + "," + entry.getValue().getLocation().getX() + "," + entry.getValue().getLocation().getY() + "," + entry.getValue().getLocation().getZ() + "," + entry.getValue().getLocation().getPitch() + "," + entry.getValue().getLocation().getYaw();
+            String locationString = entry.getValue().getLocation().getWorld() + "," + (int)entry.getValue().getLocation().getX() + "," + (int)entry.getValue().getLocation().getY() + "," + (int)entry.getValue().getLocation().getZ();
             foundItemsString.append(entry.getKey().name()).append(" : ").append(entry.getValue().getPlayer().getName()).append(" : ").append(entry.getValue().getFoundTime()).append(" : ").append(locationString).append("\n");
         }
         return foundItemsString.toString();
@@ -151,8 +148,8 @@ public final class FirstItemV3 extends JavaPlugin implements Listener {
                     double x = Double.parseDouble(locationParts[1]);
                     double y = Double.parseDouble(locationParts[2]);
                     double z = Double.parseDouble(locationParts[3]);
-                    float pitch = Float.parseFloat(locationParts[4]);
-                    float yaw = Float.parseFloat(locationParts[5]);
+                    float pitch = 0;
+                    float yaw = 0;
                     location = new Location(world, x, y, z, yaw, pitch);
                 }
                 loadeditems.put(item, new FoundItem(player, foundTime, location));
