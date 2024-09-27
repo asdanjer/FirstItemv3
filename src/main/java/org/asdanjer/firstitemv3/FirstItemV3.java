@@ -118,7 +118,7 @@ public final class FirstItemV3 extends JavaPlugin implements Listener {
                 location = player.getPlayer().getLocation();
             }
             firstFoundItems.put(item, new FoundItem(player, LocalDateTime.now(), location));
-            Bukkit.getServer().broadcastMessage(player.getName() + " found the first " + item.name().toLowerCase().replace("_", " ") + ". They better rename it to keep track of it :)");
+            Bukkit.getServer().broadcastMessage(ChatColor.BLUE +player.getName() + ChatColor.RESET + " found the first " + ChatColor.BLUE + item.name().toLowerCase().replace("_", " ") + ChatColor.RESET + ". They better rename it to keep track of it :)");
             Bukkit.getLogger().info(player.getName() + " found " + item.name() + " at " + LocalDateTime.now() + " at location " + location);
         }
     }
